@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="uploads/dramai.png" type="image/x-icon">
+    <title>User Dashboard</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            padding: 15px 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .navbar button {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar button:hover {
+            background-color: #cc0000;
+        }
+
+        /* Container Styles */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container h2 {
+            margin-top: 0;
+            color: #4CAF50;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        /* User Info Styles */
+        #user-info {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #2e7d32;
+        }
+
+        /* Prompt Card Styles */
+        .prompt {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .prompt h3 {
+            margin: 0 0 15px;
+            color: #4CAF50;
+            font-size: 22px;
+        }
+
+        .prompt ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .prompt ul li {
+            background-color: #f1f8e9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .prompt ul li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Loading and Error Styles */
+        .loading, .error {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = "/login";
+        }
+    </script>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="container">
+        <h2>User Dashboard</h2>
+        <p id="user-info"></p>
+        <div id="prompts"></div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch("api/v1/dashboard/getUserData", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+
+                const data = await response.json();
+                document.getElementById("user-info").innerHTML = `
+                    <strong>Email:</strong> ${data.data.user.email} <br>
+                `;
+
+                let promptsHtml = "";
+                data.data.prompts.forEach(prompt => {
+                    promptsHtml += `<div class="prompt">
+                        <h3>${prompt.prompt}</h3>
+                        <ul>`;
+                    prompt.answers.forEach(answer => {
+                        promptsHtml += `<li>${answer.answer}</li>`;
+                    });
+                    promptsHtml += `</ul></div>`;
+                });
+
+                document.getElementById("prompts").innerHTML = promptsHtml;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById("prompts").innerHTML = `<div class="error">Failed to load prompts. Please try again.</div>`;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>

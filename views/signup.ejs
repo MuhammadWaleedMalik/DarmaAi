@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<link rel="shortcut icon" href="uploads/dramai.png" type="image/x-icon">
+	<title>Signup Page</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f0f0f0;
+		}
+		
+		.signup-container {
+			width: 320px;
+			margin: 50px auto;
+			background-color: #fff;
+			padding: 20px;
+			border: 1px solid #ddd;
+			border-radius: 10px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		}
+		
+		.signup-header {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		
+		.signup-form {
+			margin-top: 20px;
+		}
+		
+		.signup-form input {
+			width: 90%;
+			height: 40px;
+			margin-bottom: 20px;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+		}
+		
+		.signup-form button {
+			width: 100%;
+			height: 40px;
+			background-color: #4CAF50;
+			color: #fff;
+			padding: 10px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		
+		.signup-form button:hover {
+			background-color: #3e8e41;
+		}
+		
+		.error-message {
+			color: #f00;
+			margin-bottom: 20px;
+		}
+      .signnn{
+		text-decoration: none;
+		color: #4CAF50;
+	  }
+
+	</style>
+</head>
+<body>
+	<div class="signup-container">
+		<div class="signup-header">
+			<h2>signup Page</h2>
+		</div>
+		<form class="signup-form" id="signup-form">
+			<input type="text" id="email" placeholder="email">
+			<input type="password" id="password" placeholder="Password">
+			<button id="signup-button">signup</button>
+			<div class="error-message" id="error-message"></div>
+		</form>
+
+		<div class="signup-footer">
+			<p>Already have an account? <a href="/login" class="signnn">Login</a></p>
+	</div>
+	
+	<script>
+		const signupForm = document.getElementById('signup-form');
+		const signupButton = document.getElementById('signup-button');
+		const errorMessage = document.getElementById('error-message');
+		
+		signupButton.addEventListener('click', (e) => {
+			e.preventDefault();
+			const email = document.getElementById('email').value;
+			const password = document.getElementById('password').value;
+			
+			fetch('/api/v1/user/new', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    email: email,
+    password: password
+  })
+})
+.then(response => response.json())
+.then(data => {
+  if (data.success) {
+    alert('Signup Success!');
+    window.location.href = '/login';
+  } else {
+    errorMessage.textContent = 'Invalid email or password';
+  }
+})
+.catch(error => console.error(error));
+		});
+	</script>
+</body>
+</html>
+

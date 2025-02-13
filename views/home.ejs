@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DramAI</title>
+    <link rel="shortcut icon" href="uploads/dramai.png" type="image/x-icon">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .navbar .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar .nav-buttons button {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar .nav-buttons button:hover {
+            background-color: white;
+            color: #4CAF50;
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        /* Input Field Styles */
+        .input-field {
+            margin-bottom: 20px;
+        }
+
+        .input-field input {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field input:focus {
+            border-color: #4CAF50;
+        }
+
+        /* Button Styles */
+        .generate-btn {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .generate-btn:hover {
+            background-color: #3e8e41;
+        }
+
+        /* Error Message Styles */
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* Result Styles */
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        img{
+            width: 5vw;
+            height: 5vw;
+            border-radius: 20vw;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="logo"><img src="uploads/dramai.png" alt=""></div>
+        <div class="nav-buttons">
+            <button id="translate-btn" onclick="translateToChinese()">Translate to Chinese</button>
+            <button  onclick="window.location.href='/signup'">Sign Up</button>
+            <button onclick="window.location.href='/login'">Login</button>
+            <button onclick="window.location.href='/dashboard'">Dashboard</button>
+            <button id="logout-button" style="display: none;">Logout</button>
+
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <h2>Generate Creative Names</h2>
+        <div class="input-field">
+            <input type="text" id="prompt" placeholder="Enter your prompt (e.g., 'Discuss drama Scene')">
+            <div id="error-message" class="error-message"></div>
+        </div>
+        <button class="generate-btn" onclick="generateAPI()">Generate</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Store original text for each element
+        const originalTexts = new Map();
+
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const token = localStorage.getItem("token");
+
+        // Redirect to login page if no token
+        
+
+        // Toggle visibility of buttons based on token
+        const loginBtn = document.querySelector("button[onclick=\"window.location.href='/login'\"]");
+        const signupBtn = document.querySelector("button[onclick=\"window.location.href='/signup'\"]");
+        const dashboardBtn = document.querySelector("button[onclick=\"window.location.href='/dashboard'\"]");
+        const logoutButton = document.getElementById('logout-button');
+        
+
+        if (token) {
+            loginBtn.style.display = "none";
+            signupBtn.style.display = "none";
+            logoutButton.style.display = 'block';
+        } else {
+            dashboardBtn.style.display = "none";
+            logoutButton.style.display = 'none';
+        }
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('token'); // Clear token
+            location.reload(); // Reload page
+        });
+    });
+
+
+
+        function generateAPI() {
+    const prompt = document.getElementById('prompt').value;
+    const resultDiv = document.getElementById('result');
+    const errorMessageDiv = document.getElementById('error-message');
+
+    if (!prompt) {
+        errorMessageDiv.innerText = 'Please enter a prompt';
+        return;
+    }
+
+    errorMessageDiv.innerText = '';
+
+    // Retrieve token from localStorage (if exists)
+    const token = localStorage.getItem('token');
+    
+    // Set up headers
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+
+    // Attach Authorization header if token exists
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Call API from backend
+    fetch('/api/ai/getName', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ prompt: prompt })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+        resultDiv.innerHTML = data.response.replace(/\n/g, '<br>'); // Replace newlines with <br> for HTML
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        resultDiv.innerHTML = 'Error generating names. Please try again.';
+    });
+}
+
+
+        function translateToChinese() {
+            const translateBtn = document.getElementById('translate-btn');
+            const elementsToTranslate = document.querySelectorAll('h2, .input-field input, .generate-btn, #result');
+
+            if (translateBtn.innerText === 'Translate to Chinese') {
+                // Store original text and translate to Chinese
+                elementsToTranslate.forEach(element => {
+                    const text = element.innerText || element.value;
+                    originalTexts.set(element, text); // Store original text
+
+                    fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|zh-CN`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.responseData) {
+                                const translatedText = data.responseData.translatedText;
+                                if (element.tagName === 'INPUT') {
+                                    element.value = translatedText;
+                                } else {
+                                    element.innerText = translatedText;
+                                }
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+
+                translateBtn.innerText = 'Revert to English'; // Change button text
+            } else {
+                // Revert to original English text
+                elementsToTranslate.forEach(element => {
+                    const originalText = originalTexts.get(element);
+                    if (originalText) {
+                        if (element.tagName === 'INPUT') {
+                            element.value = originalText;
+                        } else {
+                            element.innerText = originalText;
+                        }
+                    }
+                });
+
+                translateBtn.innerText = 'Translate to Chinese'; // Change button text
+            }
+        }
+    </script>
+</body>
+</html>
