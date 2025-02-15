@@ -111,11 +111,17 @@
 .then(data => {
   if (data.success) {
 	localStorage.setItem('token', data.token);
-    alert('Login Success!');
-	window.location.href = '/dashboard'
-  } else {
-    errorMessage.textContent = 'Invalid email or password';
-  }
+	if(email=='admin@airumi.org' && password == "@Abc123456"){
+		localStorage.setItem('admin',"adminToken")
+		alert('Login Success!');
+		window.location.href = '/admin'
+
+	}
+	else{
+
+		alert('Login Success!');
+		window.location.href = '/dashboard'
+	}}
 })
 .catch(error => {
   console.error('Error:', error);

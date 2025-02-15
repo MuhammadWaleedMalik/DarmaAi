@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #6200ea;
+            padding: 10px 20px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #3700b3;
+        }
+
+        /* Dashboard Styling */
+        .dashboard {
+            padding: 20px;
+        }
+
+        .dashboard h1 {
+            text-align: center;
+            color: #6200ea;
+        }
+
+        .user-list {
+            list-style-type: none;
+            padding: 0;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .user-list li {
+            background-color: white;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .user-list li:hover {
+            transform: translateY(-2px);
+        }
+
+        .user-list li span {
+            font-size: 16px;
+            color: #333;
+            display: block;
+            margin: 5px 0;
+        }
+
+        .user-list li span.label {
+            font-weight: bold;
+            color: #6200ea;
+        }
+
+        /* Button Styling */
+        .logout-btn {
+            background-color: #ff1744;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #d50000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="/">Home</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard">
+        <h1>Admin Dashboard</h1>
+        <ul class="user-list" id="user-list">
+            <!-- User details will be dynamically inserted here -->
+        </ul>
+    </div>
+
+    <script>
+        // Fetch user data from the API
+        async function fetchUserData() {
+            try {
+                const response = await fetch('/api/v1/dashboard/get');
+                const data = await response.json();
+                console.log(data);
+
+                // Check if the response contains the `users` array
+                if (Array.isArray(data.users)) {
+                    const userList = document.getElementById('user-list');
+                    userList.innerHTML = data.users.map(user => `
+                        <li>
+                            <span class="label">Name:</span> <span>${user.name}</span>
+                            <span class="label">Email:</span> <span>${user.email}</span>
+                            <span class="label">Created At:</span> <span>${new Date(user.createdAt).toLocaleString()}</span>
+                        </li>
+                    `).join('');
+                } else {
+                    alert('Failed to fetch user data: Invalid response format');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                alert('Failed to fetch user data. Please check the console for details.');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('admin');
+            window.location.href = '/';
+        }
+
+        // Fetch user data on page load
+        fetchUserData();
+    </script>
+</body>
+</html>

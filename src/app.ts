@@ -60,6 +60,9 @@ app.get('/login', (req, res) => {
 app.get('/signup', (req, res) => {
   res.render('signup');
 });
+app.get('/admin', (req, res) => {
+  res.render('admin');
+});
 
 app.get('/dashboard', (req, res) => {
 

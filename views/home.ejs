@@ -146,7 +146,7 @@
 
     <!-- Main Container -->
     <div class="container">
-        <h2>Generate Creative Names</h2>
+        <h2>Generate Creative Drama Scripts</h2>
         <div class="input-field">
             <input type="text" id="prompt" placeholder="Enter your prompt (e.g., 'Discuss drama Scene')">
             <div id="error-message" class="error-message"></div>
@@ -163,7 +163,13 @@
 
         document.addEventListener("DOMContentLoaded", function () {
         const token = localStorage.getItem("token");
+        const admin=localStorage.getItem('admin')
 
+        if(admin){
+    document.getElementById('admin').style.display = 'block';
+} else {
+    document.getElementById('admin').style.display = 'none';
+}
         // Redirect to login page if no token
         
 
@@ -183,7 +189,8 @@
             logoutButton.style.display = 'none';
         }
         logoutButton.addEventListener('click', () => {
-            localStorage.removeItem('token'); // Clear token
+            localStorage.removeItem('token'); 
+            localStorage.removeItem('admin');// Clear token
             location.reload(); // Reload page
         });
     });

@@ -118,7 +118,7 @@
         }
 
         .error {
-            color: #ff4444;
+            color: green;
         }
     </style>
 </head>
@@ -177,7 +177,7 @@
                 document.getElementById("prompts").innerHTML = promptsHtml;
             } catch (error) {
                 console.error("Error fetching data:", error);
-                document.getElementById("prompts").innerHTML = `<div class="error">Failed to load prompts. Please try again.</div>`;
+                document.getElementById("prompts").innerHTML = `<div class="error">No Prompts Found.</div>`;
             }
         }
 

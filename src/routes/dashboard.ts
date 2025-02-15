@@ -1,6 +1,7 @@
 import express,{ Request, Response } from "express";
 import { attachUserIfExists } from "../middlewares/auth.js";
 import { Data } from "../models/data.js";
+import { User } from "../models/user.js";
 
 
 
@@ -36,6 +37,20 @@ app.get("/getUserData", attachUserIfExists, async (req: CustomRequest, res: Resp
     }
 });
 
+
+
+const getAllUsers = async (req: CustomRequest, res: Response) => {
+    try {
+        const users = await User.find();
+        res.status(200).json({ users });
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ error: "Failed to fetch users. Please try again." });
+    }
+};
+
+//api/v1/dashboard/get
+app.get('/get',getAllUsers)
     
 
 
